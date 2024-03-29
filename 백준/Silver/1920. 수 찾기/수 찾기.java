@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -35,18 +34,31 @@ public class Main {
         }
     }
 
+//    private static boolean binarySearch(int target, int start, int end) {
+//        while (start <= end) {
+//            int mid = (start + end) / 2;
+//            if (target == num[mid]) {
+//                return true;
+//            } else if (target < num[mid]) {
+//                end = mid - 1;
+//            } else {
+//                start = mid + 1;
+//            }
+//        }
+//        return false;
+//    }
+
     private static boolean binarySearch(int target, int start, int end) {
-        while (start <= end) {
-            int mid = (start + end) / 2;
-            if (target == num[mid]) {
-                return true;
-            } else if (target < num[mid]) {
-                end = mid - 1;
-            } else {
-                start = mid + 1;
-            }
+
+        if (start > end) return false;
+        int mid = (start + end) / 2;
+        if (target == num[mid]) {
+            return true;
+        } else if (target < num[mid]) {
+            return binarySearch(target, start, mid - 1);
+        } else {
+            return binarySearch(target, mid + 1, end);
         }
-        return false;
     }
 }
 
