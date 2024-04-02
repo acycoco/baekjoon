@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,7 +13,7 @@ public class Main {
         long n = Integer.parseInt(br.readLine());
         long k = Integer.parseInt(br.readLine());
 
-        binarySearch(1, n * n, n, k);
+        binarySearch(1, k, n, k);
         System.out.println(answer);
 
     }
@@ -26,7 +25,7 @@ public class Main {
             if (minCount <= k - 1) {
                 answer = Math.max(answer, mid);
                 start = mid + 1;
-            } else if (minCount > k - 1) {
+            } else {
                 end = mid - 1;
             }
         }
