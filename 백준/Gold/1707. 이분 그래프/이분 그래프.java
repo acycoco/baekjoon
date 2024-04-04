@@ -1,3 +1,4 @@
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -41,9 +42,12 @@ public class Main {
 
             check = new int[nodeNum + 1];
             visited = new boolean[nodeNum + 1];
+            queue = new LinkedList<>();
             for (int j = 1; j < nodeNum + 1; j++) {
-                if (!visited[j])
-                    dfs(j);
+                if (!visited[j]) {
+//                    dfs(j);
+                    bfs(j);
+                }
                 if (!bipartite) {
                     break;
                 }
@@ -70,4 +74,25 @@ public class Main {
             }
         }
     }
+    private static void bfs(int x) {
+        queue.add(x);
+        visited[x] = true;
+        while (!queue.isEmpty()) {
+            int now = queue.poll();
+            for (int next: graph[now]) {
+                if (visited[next] == false) {
+                    visited[next] = true;
+                    queue.add(next);
+                    check[next] = (check[now] + 1) % 2;
+                } else {
+                    if (check[next] == check[now]) {
+                        bipartite = false;
+                        return;
+                    }
+                }
+            }
+        }
+    }
 }
+
+
