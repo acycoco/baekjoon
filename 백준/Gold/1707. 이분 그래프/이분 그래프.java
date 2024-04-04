@@ -42,7 +42,8 @@ public class Main {
             check = new int[nodeNum + 1];
             visited = new boolean[nodeNum + 1];
             for (int j = 1; j < nodeNum + 1; j++) {
-                dfs(j);
+                if (!visited[j])
+                    dfs(j);
                 if (!bipartite) {
                     break;
                 }
