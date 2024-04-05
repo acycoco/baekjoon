@@ -12,6 +12,9 @@ public class Main {
     static int capaA;
     static int capaB;
     static int capaC;
+    static int[] capa;
+    static int[] sender = {0, 0, 1, 1, 2, 2};
+    static int[] receiver = {1, 2, 0, 2, 0, 1};
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -21,10 +24,11 @@ public class Main {
         capaC = Integer.parseInt(st.nextToken());
         visited = new boolean[capaA + 1][capaB + 1]; //a, b의 물의 양 상태가 같은 경우를 방문했는지를 체크한다.(c는 자동으로 알 수 잇으므로)
 
+        capa = new int[]{capaA, capaB, capaC};
         queue = new LinkedList<>();
         result = new ArrayList<>();
         bfs();
-        
+
         Collections.sort(result);
         for (int i : result) {
             System.out.print(i + " ");
@@ -44,29 +48,22 @@ public class Main {
             }
             int water;
             //a->c
-            water = Math.min(a, capaC - c);
-            // a는 주는 거니까 (현재 양)과 c는 받는 입장이니까 얼마나 받을 수 있을지(용량- 현재양)를 비교해야됨
-            moveWater(a - water, b);
 
-            //a->b
-            water = Math.min(a, capaB - b);
-            moveWater(a - water, b + water);
+            for (int i = 0; i < 6; i++) {
+                int[] next = new int[]{a, b, c};
+                int s = sender[i];
+                int r = receiver[i];
+                if (next[s] > 0 && next[r] < capa[r]) {
+                    water = Math.min(next[s], capa[r] - next[r]);
+                    next[s] = next[s] - water;
+                    next[r] = next[r] + water;
+                    if (!visited[next[0]][next[1]]) {
+                        visited[next[0]][next[1]] = true;
+                        queue.add(new int[]{next[0], next[1]});
+                    }
+                }
+            }
 
-            //b->a
-            water = Math.min(b, capaA - a);
-            moveWater(a + water, b - water);
-
-            //b->c
-            water = Math.min(b, capaC - c);
-            moveWater(a, b - water);
-
-            //c->a
-            water = Math.min(c, capaA - a);
-            moveWater(a + water, b);
-
-            //c->b
-            water = Math.min(c, capaB - b);
-            moveWater(a, b + water);
 
         }
     }
