@@ -72,8 +72,10 @@ public class Main {
             for (int i = 0; i < 4; i++) {
                 int nextX = now[0] + dx[i];
                 int nextY = now[1] + dy[i];
-                if (nextX < 0 || nextX >= n || nextY < 0 || nextY >= m)
-                    continue;
+                if (nextX < 0 || nextX >= n || nextY < 0 || nextY >= m) {
+                    System.out.println(jihun[now[0]][now[1]]);
+                    return;
+                }
                 if (jihun[nextX][nextY] > 0) //이미 방문했다면
                     continue;
                 if (arr[nextX][nextY] == '#') // 벽이면 못감
@@ -81,10 +83,6 @@ public class Main {
                 if (fire[nextX][nextY] == 0 || jihun[now[0]][now[1]] + 1 < fire[nextX][nextY]) {
                     jihun[nextX][nextY] = jihun[now[0]][now[1]] + 1;
                     q2.add(new int[]{nextX, nextY});
-                    if (nextX == 0 || nextY == 0 || nextX == n - 1 || nextY == m - 1) {
-                        System.out.println(jihun[nextX][nextY]);
-                        return;
-                    }
                 }
             }
         }
