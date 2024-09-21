@@ -1,7 +1,9 @@
 import java.util.*;
 class Solution {
     public int solution(String begin, String target, String[] words) {
-        
+        if (!Arrays.asList(words).contains(target)) {
+            return 0;
+        }
         return bfs(begin, target, words);
     }
     
