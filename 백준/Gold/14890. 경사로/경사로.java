@@ -42,21 +42,19 @@ public class Main {
     }
 
     public static boolean canBeRoad(int[] road) {
-        boolean[] ramp = new boolean[n];
+        boolean[] visited = new boolean[n];
         int index = 0;
         while(index < n - 1) {
             if(road[index] + 1 == road[index + 1]) {
-                if (surroundL(index - l + 1, index, road[index], road, ramp)) {
-                    index = index + 1;
-                } else {
+                if (!surroundL(index - l + 1, index, road[index], road, visited)) {
                     return false;
                 }
+                index = index + 1;
             } else if (road[index] - 1 == road[index + 1]) {
-                if (surroundL(index + 1, index + l, road[index + 1], road, ramp)) {
-                    index = index + l;
-                } else {
+                if (!surroundL(index + 1, index + l, road[index + 1], road, visited)) {
                     return false;
                 }
+                index = index + l;
             } else if (road[index] == road[index + 1]) {
                 index++;
             } else {
@@ -66,17 +64,15 @@ public class Main {
         return true;
     }
 
-    public static boolean surroundL(int start, int end, int target, int[] road, boolean[] ramp) {
-        if (start < 0 || start >= n || end < 0 || end >= n) {
+    public static boolean surroundL(int start, int end, int target, int[] road, boolean[] visited) {
+        if (start < 0 || end >= n) {
             return false;
         }
         for (int i = start; i <= end; i++) {
-            if (road[i] != target || ramp[i]) {
+            if (road[i] != target || visited[i]) {
                 return false;
             }
-        }
-        for (int i = start; i <= end; i++) {
-            ramp[i] = true;
+            visited[i] = true;
         }
         return true;
     }
