@@ -1,166 +1,121 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.StringTokenizer;
 
 public class Main {
-    static int N, M;
-    static char[][] board;
-    static int[] dx = {-1, 1, 0, 0}; // 상, 하, 좌, 우
-    static int[] dy = {0, 0, -1, 1};
-    
-    static class State {
-        int rx, ry, bx, by, count;
-        
-        public State(int rx, int ry, int bx, int by, int count) {
-            this.rx = rx;
-            this.ry = ry;
-            this.bx = bx;
-            this.by = by;
-            this.count = count;
-        }
-    }
-    
-    public static int bfs(int rx, int ry, int bx, int by) {
-        Queue<State> queue = new LinkedList<>();
-        boolean[][][][] visited = new boolean[N][M][N][M];
-        
-        queue.offer(new State(rx, ry, bx, by, 0));
-        visited[rx][ry][bx][by] = true;
-        
-        while (!queue.isEmpty()) {
-            State current = queue.poll();
-            
-            if (current.count > 10) return -1;
-            
-            if (board[current.bx][current.by] == 'O') continue;
-            
-            if (board[current.rx][current.ry] == 'O') return current.count;
-            
-            for (int i = 0; i < 4; i++) {
-                int[] result = move(current.rx, current.ry, current.bx, current.by, i);
-                
-                int nrx = result[0], nry = result[1], nbx = result[2], nby = result[3];
-                
-                if (!visited[nrx][nry][nbx][nby]) {
-                    queue.offer(new State(nrx, nry, nbx, nby, current.count + 1));
-                    visited[nrx][nry][nbx][nby] = true;
-                }
-            }
-        }
-        
-        return -1;
-    }
-    
-    public static int[] move(int rx, int ry, int bx, int by, int direction) {
-        int[] result = new int[4];
-        boolean redFirst = false;
-        
-        // 방향에 따라 먼저 움직일 구슬 결정
-        if ((direction == 0 && rx < bx) || 
-            (direction == 1 && rx > bx) || 
-            (direction == 2 && ry < by) || 
-            (direction == 3 && ry > by)) {
-            redFirst = true;
-        }
-        
-        // 첫 번째 구슬 이동
-        if (redFirst) {
-            int[] red = moveMarble(rx, ry, direction);
-            rx = red[0];
-            ry = red[1];
-            
-            int[] blue = moveMarble(bx, by, direction);
-            bx = blue[0];
-            by = blue[1];
-        } else {
-            int[] blue = moveMarble(bx, by, direction);
-            bx = blue[0];
-            by = blue[1];
-            
-            int[] red = moveMarble(rx, ry, direction);
-            rx = red[0];
-            ry = red[1];
-        }
-        
-        // 구슬이 같은 위치에 있다면 위치 조정
-        if (rx == bx && ry == by && board[rx][ry] != 'O') {
-            switch(direction) {
-                case 0: // 상
-                    if (redFirst) bx++;
-                    else rx++;
-                    break;
-                case 1: // 하
-                    if (redFirst) bx--;
-                    else rx--;
-                    break;
-                case 2: // 좌
-                    if (redFirst) by++;
-                    else ry++;
-                    break;
-                case 3: // 우
-                    if (redFirst) by--;
-                    else ry--;
-                    break;
-            }
-        }
-        
-        result[0] = rx;
-        result[1] = ry;
-        result[2] = bx;
-        result[3] = by;
-        
-        return result;
-    }
-    
-    public static int[] moveMarble(int x, int y, int direction) {
-        while (true) {
-            int nx = x + dx[direction];
-            int ny = y + dy[direction];
-            
-            if (board[nx][ny] == '#') break;
-            
-            if (board[nx][ny] == 'O') {
-                x = nx;
-                y = ny;
-                break;
-            }
-            
-            x = nx;
-            y = ny;
-        }
-        
-        return new int[]{x, y};
-    }
-    
+    static int n;
+    static int m;
+    static final char RED = 'R';
+    static final char BLUE = 'B';
+    static final char WALL = '#';
+    static final char HOLE = 'O';
+    static int[] dx = new int[]{-1, 1, 0, 0};
+    static int[] dy = new int[]{0, 0, -1, 1};
+    static char[][] arr;
+    static boolean[][][][] visited;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
-        
-        board = new char[N][M];
-        
-        int rx = 0, ry = 0, bx = 0, by = 0;
-        
-        for (int i = 0; i < N; i++) {
+        n = Integer.parseInt(st.nextToken());
+        m = Integer.parseInt(st.nextToken());
+        arr = new char[n][m];
+        visited = new boolean[n][m][n][m];
+        int rX = 0;
+        int rY = 0;
+        int bX = 0;
+        int bY = 0;
+        for (int i = 0; i < n; i++) {
             String line = br.readLine();
-            for (int j = 0; j < M; j++) {
-                board[i][j] = line.charAt(j);
-                
-                if (board[i][j] == 'R') {
-                    rx = i;
-                    ry = j;
-                    board[i][j] = '.';
+            arr[i] = line.toCharArray();
+
+            for (int j = 0; j < m; j++) {
+                if (arr[i][j] == RED) {
+                    rX = i;
+                    rY = j;
+                    arr[i][j] = '.';
                 }
-                
-                if (board[i][j] == 'B') {
-                    bx = i;
-                    by = j;
-                    board[i][j] = '.';
+                if (arr[i][j] == BLUE) {
+                    bX = i;
+                    bY = j;
+                    arr[i][j] = '.';
                 }
             }
         }
-        
-        System.out.println(bfs(rx, ry, bx, by));
+
+        System.out.println(bfs(rX, rY, bX, bY));
+
     }
+
+
+    public static int bfs(int rX, int rY, int bX, int bY) {
+        Queue<State> queue = new LinkedList<>();
+        queue.offer(new State(rX, rY, bX, bY, 0));
+        visited[rX][rY][bX][bY] = true;
+
+        while (!queue.isEmpty()) {
+            State current = queue.poll();
+            if (current.moves >= 10) return -1;
+            for (int i = 0; i < 4; i++) {
+                int[] redResult = move(current.redX, current.redY, i);
+                int[] blueResult = move(current.blueX, current.blueY, i);
+
+                int newRedX = redResult[0], newRedY = redResult[1];
+                int newBlueX = blueResult[0], newBlueY = blueResult[1];
+
+                boolean redInHole = redResult[2] == 1;
+                boolean blueInHole = blueResult[2] == 1;
+
+                if (blueInHole) continue;
+                if (redInHole) return current.moves + 1;
+
+                if (newRedX == newBlueX && newRedY == newBlueY) {
+                    if (redResult[3] > blueResult[3]) {
+                        newRedX -= dx[i];
+                        newRedY -= dy[i];
+                    } else {
+                        newBlueX -= dx[i];
+                        newBlueY -= dy[i];
+                    }
+                }
+
+                if (!visited[newRedX][newRedY][newBlueX][newBlueY]) {
+                    visited[newRedX][newRedY][newBlueX][newBlueY] = true;
+                    queue.add(new State(newRedX, newRedY, newBlueX, newBlueY, current.moves + 1));
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    public static int[] move(int x, int y, int dir) {
+        int[] result = new int[4];
+        
+        int distance = 0;
+        while (true) {
+            if (arr[x][y] == HOLE) break; // 구멍에 도달하면 즉시 중단
+            if (arr[x + dx[dir]][y + dy[dir]] == WALL) break; // 벽에 막히면 중단
+            x += dx[dir];
+            y += dy[dir];
+            distance++;
+        }
+        return new int[]{x, y, arr[x][y] == HOLE ? 1 : 0, distance};
+    }
+
+    static class State {
+        int redX, redY, blueX, blueY, moves;
+
+        State(int redX, int redY, int blueX, int blueY, int moves) {
+            this.redX = redX;
+            this.redY = redY;
+            this.blueX = blueX;
+            this.blueY = blueY;
+            this.moves = moves;
+        }
+    }
+
+
 }
