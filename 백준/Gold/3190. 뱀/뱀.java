@@ -1,82 +1,69 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 public class Main {
-    static int N, K, L;
-    static int[][] board;
-    static Map<Integer, Character> directions = new HashMap<>();
-    static int[] dx = {0, 1, 0, -1}; // 우, 하, 좌, 상
-    static int[] dy = {1, 0, -1, 0};
-    
+
+    static int n;
+    static int k;
+    static int[][] arr;
+    static boolean[][] visited;
+    static int[] dx = new int[]{-1, 0, 1, 0};
+    static int[] dy = new int[]{0, 1, 0, -1};
+    static List<int[]> rotations = new ArrayList<>();
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        N = Integer.parseInt(br.readLine());
-        K = Integer.parseInt(br.readLine());
-        
-        board = new int[N + 1][N + 1];
-        
-        // 사과 위치 저장
-        for (int i = 0; i < K; i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
+        n = Integer.parseInt(br.readLine());
+        k = Integer.parseInt(br.readLine());
+        StringTokenizer st;
+        arr = new int[n + 1][n + 1];
+        visited = new boolean[n + 1][n + 1];
+        for (int i = 0; i < k; i++) {
+            st = new StringTokenizer(br.readLine());
             int x = Integer.parseInt(st.nextToken());
             int y = Integer.parseInt(st.nextToken());
-            board[x][y] = 1; // 사과는 1로 표시
+            arr[x][y] = 1; //사과 1 뱀 2
         }
-        
-        // 방향 변환 정보 저장
-        L = Integer.parseInt(br.readLine());
-        for (int i = 0; i < L; i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            int time = Integer.parseInt(st.nextToken());
-            char direction = st.nextToken().charAt(0);
-            directions.put(time, direction);
+        int rotation = Integer.parseInt(br.readLine());
+        int d = 1;
+        Queue<int[]> snake = new LinkedList<>();
+        for (int i = 0; i < rotation; i++) {
+            st = new StringTokenizer(br.readLine());
+            int sec = Integer.parseInt(st.nextToken());
+            rotations.add(new int[]{sec, d});
+            char dir = st.nextToken().charAt(0);
+            if (dir == 'L') {
+                d = (d + 3) % 4;
+            } else {
+                d = (d + 1) % 4;
+            }
         }
-        
-        System.out.println(simulate());
-    }
-    
-    public static int simulate() {
-        int time = 0;
-        int direction = 0; // 처음에는 오른쪽을 향함
-        
-        // 뱀의 위치를 저장하는 덱 (머리가 앞, 꼬리가 뒤)
-        Deque<int[]> snake = new ArrayDeque<>();
+        rotations.add(new int[]{Integer.MAX_VALUE, d});
         snake.offer(new int[]{1, 1});
-        board[1][1] = 2; // 뱀의 위치는 2로 표시
-        
-        while (true) {
-            time++;
-            
-            // 다음 위치 계산
-            int[] head = snake.peekFirst();
-            int nx = head[0] + dx[direction];
-            int ny = head[1] + dy[direction];
-            
-            // 벽이나 자기 자신과 부딪히는지 확인
-            if (nx < 1 || nx > N || ny < 1 || ny > N || board[nx][ny] == 2) {
-                break;
+        visited[1][1] = true;
+        System.out.println(simulate(0, 0, 1, 1, snake));
+    }
+
+    public static int simulate(int depth, int now, int x, int y, Queue<int[]> snake) {
+        int[] rotation = rotations.get(depth);
+        for (int sec = now; sec < rotation[0]; sec++) {
+            int nx = (x + dx[rotation[1]]);
+            int ny = (y + dy[rotation[1]]);
+            if (nx > n || ny > n || nx < 1 || ny < 1 || visited[nx][ny]) { //뱀의 몸을 만난다면
+                return sec + 1;
             }
-            
-            // 사과가 없다면 꼬리 제거
-            if (board[nx][ny] != 1) {
-                int[] tail = snake.pollLast();
-                board[tail[0]][tail[1]] = 0;
+            if (arr[nx][ny] == 0) { //사과가 없다면
+                int[] end = snake.poll();
+                visited[end[0]][end[1]] = false;
+                arr[end[0]][end[1]] = 0;
             }
-            
-            // 새로운 머리 위치 추가
-            snake.offerFirst(new int[]{nx, ny});
-            board[nx][ny] = 2;
-            
-            // 방향 전환 확인
-            if (directions.containsKey(time)) {
-                if (directions.get(time) == 'L') {
-                    direction = (direction + 3) % 4;
-                } else {
-                    direction = (direction + 1) % 4;
-                }
-            }
+            arr[nx][ny] = 2;
+            visited[nx][ny] = true;
+            snake.offer(new int[]{nx, ny});
+            x = nx;
+            y = ny;
         }
-        
-        return time;
+        return simulate(depth + 1, rotation[0], x, y, snake);
     }
 }
