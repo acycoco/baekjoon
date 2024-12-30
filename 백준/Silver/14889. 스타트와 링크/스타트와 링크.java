@@ -1,3 +1,4 @@
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -21,7 +22,8 @@ public class Main {
             }
         }
 
-        dfs(0,0);
+        visited[0] = true;
+        dfs(1,0);
         System.out.println(min);
     }
 
@@ -31,14 +33,11 @@ public class Main {
             return;
         }
 
-        if (nowIndex >= n) {
-            return;
+        for (int i = nowIndex + 1; i < n; i++) {
+            visited[i] = true;
+            dfs(selectedCount + 1, i);
+            visited[i] = false;
         }
-        visited[nowIndex] = true;
-        dfs(selectedCount + 1, nowIndex + 1);
-
-        visited[nowIndex] = false;
-        dfs(selectedCount, nowIndex + 1);
     }
 
     public static void calculateDifference() {
