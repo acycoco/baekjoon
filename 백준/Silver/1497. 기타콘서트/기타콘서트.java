@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,7 +8,7 @@ public class Main {
     static int m;
     static long[] gitars;
     static int maxSong = 0;
-    static int minGuitar = Integer.MAX_VALUE;
+    static int minGuitar = -1;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -22,28 +21,24 @@ public class Main {
             gitars[i] = toBit(gitar);
         }
 
-        dfs(0L, 0, 0);
-        if (maxSong == 0) {
-            System.out.println(-1);
-        } else {
-            System.out.println(minGuitar);
-        }
-
-    }
-
-    public static void dfs(long curSum, int used, int index) {
-        if (index == n) {
-            int songCount = Long.bitCount(curSum);
-            if (songCount > maxSong) {
-                maxSong = songCount;
-                minGuitar = Integer.bitCount(used);  // 새로운 maxSong에 해당하는 기타 수 갱신
-            } else if (songCount == maxSong) {
-                minGuitar = Math.min(minGuitar, Integer.bitCount(used));  // 동일한 곡 수일 경우 기타 수 갱신
+        for (int i = 0; i < (1 << n); i++) {
+            long comb = 0;
+            for (int j = 0; j < n; j++) {
+                if ((i & (1 << j)) == 0) continue;
+                comb |= gitars[j];
             }
-            return;
+
+            int songCount = Long.bitCount(comb);
+            int guitarCount = Integer.bitCount(i);
+            if (maxSong < songCount) {
+                maxSong = songCount;
+                minGuitar = guitarCount;
+            } else if (maxSong == songCount && minGuitar > guitarCount) {
+                minGuitar = guitarCount;
+            }
         }
-        dfs(curSum | gitars[index], used | (1 << index), index + 1);
-        dfs(curSum, used, index + 1);
+        System.out.println(minGuitar);
+
     }
 
 
