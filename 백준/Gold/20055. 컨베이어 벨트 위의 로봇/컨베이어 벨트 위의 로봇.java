@@ -9,6 +9,7 @@ public class Main {
     static int k;
     static int[] arr;
     static boolean[] robot;
+    static int cnt;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -67,6 +68,9 @@ public class Main {
                 robot[i + 1] = true;
                 robot[i] = false;
                 arr[i + 1]--;
+                if (arr[i + 1] == 0) {
+                    cnt++;
+                }
             }
         }
         robot[n - 1] = false; // 즉시 내린다.
@@ -74,13 +78,8 @@ public class Main {
     //로봇이 올리거나 어떤칸으로 이동 시 내구도 -1
 
     static boolean stopRotate() {
-        int count = 0;
-        for (int i = 0; i < 2 * n; i++) {
-            if (arr[i] == 0) {
-                count++;
-            }
-        }
-        return count >= k;
+        
+        return cnt >= k;
     }
 
     static void putOnRobot() {
@@ -88,6 +87,9 @@ public class Main {
         if (arr[0] != 0) {
             robot[0] = true;
             arr[0]--;
+            if (arr[0] == 0) {
+                cnt++;
+            }
         }
     }
 }
