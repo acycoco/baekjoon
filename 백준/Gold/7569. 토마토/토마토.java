@@ -1,3 +1,4 @@
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,7 +11,6 @@ public class Main {
     static int n;
     static int h;
     static int[][][] arr;
-    static boolean[][][] visited;
     static Queue<int[]> queue = new LinkedList<>();
     static int[] dx = {0, 1, 0, -1, 0, 0};
     static int[] dy = {1, 0, -1, 0, 0, 0};
@@ -23,7 +23,6 @@ public class Main {
         m = Integer.parseInt(st.nextToken());
         n = Integer.parseInt(st.nextToken());
         h = Integer.parseInt(st.nextToken());
-        visited = new boolean[h][n][m];
         arr = new int[h][n][m];
         for (int i = 0; i < h; i++) {
             for (int j = 0; j < n; j++) {
@@ -31,8 +30,7 @@ public class Main {
                 for (int k = 0; k < m; k++) {
                     int tomato = Integer.parseInt(st.nextToken());
                     if (tomato == 1) {
-                        queue.add(new int[]{i, j, k, 0});
-                        visited[i][j][k] = true;
+                        queue.add(new int[]{i, j, k});
                     }
                     arr[i][j][k] = tomato;
                 }
@@ -40,11 +38,7 @@ public class Main {
         }
 
         int answer = bfs();
-        if (isFinish()) {
-            System.out.println(answer);
-            return;
-        }
-        System.out.println(-1);
+        System.out.println(answer);
     }
 
     public static int bfs() {
@@ -59,29 +53,29 @@ public class Main {
                 if (nx < 0 || nx >= n || ny < 0 || ny >= m || nh < 0 || nh >= h) {
                     continue;
                 }
-                if (visited[nh][nx][ny] || arr[nh][nx][ny] != 0) { //이미 익었거나 안익은 토마토가 아니면
+                if (arr[nh][nx][ny] != 0) { //이미 익었거나 안익은 토마토가 아니면
                     continue;
                 }
-                arr[nh][nx][ny] = 1;
-                queue.add(new int[]{nh, nx, ny, cur[3] + 1});
-                visited[nh][nx][ny] = true;
-                day = Math.max(cur[3] + 1, day);
+                arr[nh][nx][ny] = arr[cur[0]][cur[1]][cur[2]] + 1;
+                queue.add(new int[]{nh, nx, ny});
             }
         }
 
-        return day;
+        return isFinish();
     }
 
-    public static boolean isFinish() {
+    public static int isFinish() {
+        int anwer = 0;
         for (int i = 0; i < h; i++) {
             for (int j = 0; j < n; j++) {
                 for (int k = 0; k < m; k++) {
                     if (arr[i][j][k] == 0) {
-                        return false;
+                        return -1;
                     }
+                    anwer = Math.max(anwer, arr[i][j][k]);
                 }
             }
         }
-        return true;
+        return anwer - 1;
     }
 }
