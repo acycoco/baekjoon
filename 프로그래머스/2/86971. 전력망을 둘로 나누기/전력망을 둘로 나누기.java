@@ -1,55 +1,106 @@
 import java.util.*;
 class Solution {
-
-    public int solution(int n, int[][] wires) {
-        int minDiff = n;
-        for(int i = 0; i < wires.length; i++) {
-            int[] parent = new int[n + 1]; //연결되어 있는 작은 노드를 부모로
-            int[] rank = new int[n + 1];
-            for(int j = 1; j <= n; j++) {
-                parent[j] = j;
-            }
-            for(int j = 0; j < wires.length; j++) {
-                if(i == j) 
-                    continue;
-                union(wires[j][0], wires[j][1], parent);
-            }
-            int diff = Math.abs(n - countNodes(1, n, parent) * 2);
-            minDiff = Math.min(diff, minDiff);
-        }
-        return minDiff;
-    }
-    
-    public int find(int a, int[] parent) {
-        if(a == parent[a]) 
-            return a;
-        return parent[a] = find(parent[a], parent);
-    }
-    
-    public void union(int a, int b, int[] parent) {
-        int parentA = find(a, parent);
-        int parentB = find(b, parent);
+    int[] parent;
+    public void union(int a, int b) {
+        int findA = find(a);
+        int findB = find(b);
         
-        if(parentA == parentB) {
-            return;       
-        } else if (parentA < parentB) {
-            parent[parentA] = parentB;
-        } else {
-            parent[parentB] = parentA;
+        if(findA < findB) {
+            parent[findB] = findA;
+        } else if(findA > findB) {
+            parent[findA] = findB;
         }
-        
     }
     
-    public int countNodes(int a, int n, int[] parent) {
-        int count = 0;
-        int parentA = find(a, parent);
+    public int find(int a) {
+        if(parent[a] == a) return a;
+        return parent[a] = find(parent[a]);
+    }
+    
+    public int delete(int indexWire, int n, int[][] wires) {
+        parent = new int[n + 1];
         for(int i = 1; i <= n; i++) {
-            if(find(i, parent) == parentA) {
-                count++;
-            }
+            parent[i] = i;
         }
-        return count;
+         for(int i = 0 ; i < n - 1; i++) {
+            if(i == indexWire) continue;
+            union(wires[i][0], wires[i][1]);
+        }
+        return calculateDiff(n);
     }
+    public int calculateDiff(int n) {
+        int parentA = find(1);
+        int countA = 1;
+        for(int i = 2; i <= n; i++) {
+            if(parentA == find(i)) countA++;
+        }
+        return Math.abs(n - countA * 2);
+    }
+    public int solution(int n, int[][] wires) {
+        
+        //트리를 2개로 분할
+        //개수를 비슷하게
+        //차이 절댓값 리턴
+     
+        int result = n;
+        for(int i = 0 ; i < n - 1; i++) {
+            result = Math.min(delete(i, n, wires), result);
+        }
+        
+        return result;
+        
+    
+        // int minDiff = n;
+        // for(int i = 0; i < wires.length; i++) {
+        //     int[] parent = new int[n + 1]; //연결되어 있는 작은 노드를 부모로
+        //     int[] rank = new int[n + 1];
+        //     for(int j = 1; j <= n; j++) {
+        //         parent[j] = j;
+        //     }
+        //     for(int j = 0; j < wires.length; j++) {
+        //         if(i == j) 
+        //             continue;
+        //         union(wires[j][0], wires[j][1], parent, rank);
+        //     }
+        //     int diff = Math.abs(n - countNodes(1, n, parent) * 2);
+        //     minDiff = Math.min(diff, minDiff);
+        // }
+        // return minDiff;
+    }
+    
+//     public int find(int a, int[] parent) {
+//         if(a == parent[a]) 
+//             return a;
+//         return parent[a] = find(parent[a], parent);
+//     }
+    
+//     public void union(int a, int b, int[] parent, int[] rank) {
+//         int parentA = find(a, parent);
+//         int parentB = find(b, parent);
+        
+//          if (parentA != parentB) {
+//             if (rank[parentA] > rank[parentB]) {
+//                 parent[parentB] = parentA;
+//             } else if (rank[parentA] < rank[parentB]) {
+//                 parent[parentA] = parentB;
+//             } else {
+//                 parent[parentB] = parentA;
+//                 rank[parentA]++;
+//             }
+//         }
+        
+//     }
+    
+//     public int countNodes(int a, int n, int[] parent) {
+//         int count = 0;
+//         int parentA = find(a, parent);
+//         for(int i = 1; i <= n; i++) {
+//             if(find(i, parent) == parentA) {
+//                 count++;
+//             }
+//         }
+//         return count;
+//     }
 //     public int solution(int n, int[][] wires) {
 //         List<List<Integer>> edges = new ArrayList<>();
 //         for(int i = 0; i <= n; i++) {
