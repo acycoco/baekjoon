@@ -1,22 +1,37 @@
 import java.util.*;
 class Solution {
     public String solution(String[] participant, String[] completion) {
+        //완주하지 못한 선수 이름을 리턴해야됨
+        //동명이인이 있을 수 있음.
         Map<String, Integer> map = new HashMap<>();
         for(String name: participant) {
             map.put(name, map.getOrDefault(name, 0) + 1);
         }
-        
         for(String comp: completion) {
             map.put(comp, map.get(comp) - 1);
         }
-        
-      
         for(String name: map.keySet()) {
-            if(map.get(name) > 0) {
+             if(map.get(name) > 0) {
                 return name;
             }
         }
         return "";
+//         Map<String, Integer> map = new HashMap<>();
+//         for(String name: participant) {
+//             map.put(name, map.getOrDefault(name, 0) + 1);
+//         }
+        
+//         for(String comp: completion) {
+//             map.put(comp, map.get(comp) - 1);
+//         }
+        
+      
+//         for(String name: map.keySet()) {
+//             if(map.get(name) > 0) {
+//                 return name;
+//             }
+//         }
+//         return "";
         
 //         Map<String, Integer> people = new HashMap();
 //         for(int i = 0; i < participant.length; i++) {
