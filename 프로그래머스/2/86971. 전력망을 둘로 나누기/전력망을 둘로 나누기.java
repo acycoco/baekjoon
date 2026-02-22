@@ -1,53 +1,103 @@
 import java.util.*;
 class Solution {
-    int[] parent;
-    public void union(int a, int b) {
-        int findA = find(a);
-        int findB = find(b);
+    
+    public static class TreeNode {
+        TreeNode left;
+        TreeNode right;
+        int val;
+         public TreeNode(int val) {
+            this.val = val;
+        }
+        public TreeNode(int val, TreeNode left, TreeNode right) {
+            this.left = left;
+            this.right = right;
+            this.val = val;
+        }
+    }
+    
+    int min;
+    ArrayList<Integer>[] graph;
+    boolean[] visited;
+    public int visitPost(int cur, int n) {
+        int sum = 1;    
+        visited[cur] = true;
+        for (int next: graph[cur]) {
+            if (visited[next]) continue;
+            sum += visitPost(next, n);
+        }
         
-        if(findA < findB) {
-            parent[findB] = findA;
-        } else if(findA > findB) {
-            parent[findA] = findB;
-        }
-    }
-    
-    public int find(int a) {
-        if(parent[a] == a) return a;
-        return parent[a] = find(parent[a]);
-    }
-    
-    public int delete(int indexWire, int n, int[][] wires) {
-        parent = new int[n + 1];
-        for(int i = 1; i <= n; i++) {
-            parent[i] = i;
-        }
-         for(int i = 0 ; i < n - 1; i++) {
-            if(i == indexWire) continue;
-            union(wires[i][0], wires[i][1]);
-        }
-        return calculateDiff(n);
-    }
-    public int calculateDiff(int n) {
-        int parentA = find(1);
-        int countA = 1;
-        for(int i = 2; i <= n; i++) {
-            if(parentA == find(i)) countA++;
-        }
-        return Math.abs(n - countA * 2);
+        min = Math.min(Math.abs(n - sum * 2), min);
+        return sum;
     }
     public int solution(int n, int[][] wires) {
+        //후위 순위를 하면 근데 루트를 뭘로 잡느냐가 중요하니까 풀수가 없음?
+        graph = new ArrayList[n + 1];
         
-        //트리를 2개로 분할
-        //개수를 비슷하게
-        //차이 절댓값 리턴
-     
-        int result = n;
-        for(int i = 0 ; i < n - 1; i++) {
-            result = Math.min(delete(i, n, wires), result);
+        for (int i = 1; i <= n; i++) {
+            graph[i] = new ArrayList<>();
         }
         
-        return result;
+        for (int[] wire : wires) {
+            int a = wire[0];
+            int b = wire[1];
+            graph[a].add(b);
+            graph[b].add(a);
+        }
+        min = n;
+        visited = new boolean[n + 1];
+        visited[1] = true;
+        visitPost(1, n);
+        return min;
+                
+        
+//     int[] parent;
+//     public void union(int a, int b) {
+//         int findA = find(a);
+//         int findB = find(b);
+        
+//         if(findA < findB) {
+//             parent[findB] = findA;
+//         } else if(findA > findB) {
+//             parent[findA] = findB;
+//         }
+//     }
+    
+//     public int find(int a) {
+//         if(parent[a] == a) return a;
+//         return parent[a] = find(parent[a]);
+//     }
+    
+//     public int delete(int indexWire, int n, int[][] wires) {
+//         parent = new int[n + 1];
+//         for(int i = 1; i <= n; i++) {
+//             parent[i] = i;
+//         }
+//          for(int i = 0 ; i < n - 1; i++) {
+//             if(i == indexWire) continue;
+//             union(wires[i][0], wires[i][1]);
+//         }
+//         return calculateDiff(n);
+//     }
+//     public int calculateDiff(int n) {
+//         int parentA = find(1);
+//         int countA = 1;
+//         for(int i = 2; i <= n; i++) {
+//             if(parentA == find(i)) countA++;
+//         }
+//         return Math.abs(n - countA * 2);
+//     }
+//     public int solution(int n, int[][] wires) {
+        
+//         //트리를 2개로 분할
+//         //개수를 비슷하게
+//         //차이 절댓값 리턴
+     
+//         int result = n;
+//         for(int i = 0 ; i < n - 1; i++) {
+//             result = Math.min(delete(i, n, wires), result);
+//         }
+        
+//         return result;
         
     
         // int minDiff = n;
